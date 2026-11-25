@@ -275,6 +275,41 @@ function drawPara(cv: Canvas, x: number, y: number, scale: number, c: RGB, s: st
   return y + lines.length * (7 * scale + lineGap);
 }
 
+// ------------------------------------------------------- verification badges
+// Chunk C1: one small "BADGE - SOURCE" line per story. Badge word is drawn
+// in its colour on a light pill; the source follows on the same line.
+// Compact advance (11px/char at scale 2 instead of 12) so the longest line
+// ("CONFIRMED - MULTIPLE OUTLETS", 28 chars = 307px) fits the 304px strip
+// columns and the 309px lead columns without touching the next column.
+const BADGE_COLORS: Record<string, RGB> = {
+  OFFICIAL: GREEN,
+  CONFIRMED: NAVY,
+  REPORTED: RED,
+};
+
+function badgeTextWidth(s: string): number {
+  return s.length * 11 - 1;
+}
+
+function drawBadge(cv: Canvas, x: number, y: number, badge: string, source: string): void {
+  const s = badge + " - " + source;
+  const w = badgeTextWidth(s);
+  cv.rect(x - 4, y - 1, w + 8, 16, LIGHT);
+  cv.frame(x - 4, y - 1, w + 8, 16, BADGE_COLORS[badge]);
+  const t = s.toUpperCase();
+  let cx = x;
+  const c = BADGE_COLORS[badge];
+  for (const ch of t) {
+    const g = FONT[ch] ?? FONT["?"];
+    for (let r = 0; r < 7; r++) {
+      for (let col = 0; col < 5; col++) {
+        if (g[r][col] === "1") cv.rect(cx + col * 2, y + r * 2, 2, 2, c);
+      }
+    }
+    cx += 11;
+  }
+}
+
 // ------------------------------------------------------- pictograms (48x48)
 // Each icon is drawn in a 48x48 box at (x, y) in ink + one accent colour.
 function iconSatellite(cv: Canvas, x: number, y: number): void {
@@ -487,6 +522,8 @@ interface Story {
   icon: (cv: Canvas, x: number, y: number) => void;
   head: string;
   body: string;
+  badge: string;
+  source: string;
 }
 
 const SECONDARY: Story[] = [
@@ -494,39 +531,53 @@ const SECONDARY: Story[] = [
     icon: iconCourt,
     head: "HUAWEI CONVICTED IN US COURT",
     body: "GUILTY ON IRAN BUSINESS AND TRADE-SECRET THEFT CHARGES IN A US CRIMINAL TRIAL.",
+    badge: "OFFICIAL",
+    source: "REUTERS",
   },
   {
     icon: iconWindows,
     head: "MICROSOFT DECLARES 'CODE RED'",
     body: "AFTER A HISTORIC OUTAGE; A LEAKED INTERNAL MEMO REVEALS THE CRISIS RESPONSE.",
+    badge: "REPORTED",
+    source: "THE HINDU",
   },
   {
     icon: iconMusic,
     head: "SINGER FLOGGED 74 LASHES AFTER YOUTUBE CONCERT",
     body: "IRAN SENTENCES SINGER PARASTOO AHMADI TO 74 LASHES FOR PERFORMING WITHOUT A HEADSCARF IN AN ONLINE CONCERT.",
+    badge: "CONFIRMED",
+    source: "MULTIPLE OUTLETS",
   },
   {
     icon: iconTanker,
     head: "IRAN REJECTS US TALKS; MINES HIT TANKERS",
     body: "THREE TANKERS HIT BY MINES IN HORMUZ; RIYADH ATTACKED; HOUTHI THREAT TO SAUDI PORTS.",
+    badge: "CONFIRMED",
+    source: "MULTIPLE OUTLETS",
   },
 ];
 
-const STRIP: { kick: string; head: string; body: string }[] = [
+const STRIP: { kick: string; head: string; body: string; badge: string; source: string }[] = [
   {
     kick: "USA",
     head: "TRUMP PARDONS TURKEYS 'FREEDOM' AND 'FEATHERS'",
     body: "ALSO: MEDAL OF FREEDOM FOR GIULIANI.",
+    badge: "OFFICIAL",
+    source: "MULTIPLE OUTLETS",
   },
   {
     kick: "GAMES",
     head: "GTA 6: 39 MILLION PS5 PLAYERS IN 4 DAYS",
     body: "BIGGEST SONY LAUNCH IN 30 YEARS.",
+    badge: "REPORTED",
+    source: "MULTIPLE OUTLETS",
   },
   {
     kick: "SPORT",
     head: "SURYAVANSHI, 15, SMASHES RECORD 204*",
     body: "204 OFF 53 BALLS, A WORLD RECORD.",
+    badge: "REPORTED",
+    source: "MULTIPLE OUTLETS",
   },
 ];
 
@@ -551,31 +602,46 @@ interface Lead {
   art: (cv: Canvas, x: number, y: number, w: number, h: number) => void;
   head: string;
   body: string;
+  badge: string;
+  source: string;
 }
 const LEADS: Lead[] = [
   {
     art: drawLeadArt,
     head: "ZELENSKIY: WE HIT RUSSIAN SHIP",
     body: "UKRAINE WAS BEHIND SATURDAY'S DRONE STRIKE ON A RUSSIAN CARGO SHIP IN THE GULF OF FINLAND.",
+    badge: "OFFICIAL",
+    source: "REUTERS",
   },
   {
     art: drawLeadArtSatellite,
     head: "NATO VOWS SPACE DEFENCE",
     body: "NATO PLEDGES TO DEFEND SPACE AFTER A REPORT THAT RUSSIA PLANS A NUCLEAR-ARMED SATELLITE LAUNCH.",
+    badge: "OFFICIAL",
+    source: "WH NEWS",
   },
   {
     art: drawLeadArtRocket,
     head: "SHENZHOU-24 LAUNCHES TO TIANGONG",
     body: "CHINA LAUNCHES A CREW TO ITS SPACE STATION, CARRYING THE FIRST PAKISTANI ASTRONAUT.",
+    badge: "OFFICIAL",
+    source: "MULTIPLE OUTLETS",
   },
 ];
 
-function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string, maxWidth: number): number {
+// Ticker stories (Chunk C1): each on its own footer line with its badge.
+const TICKER: { head: string; badge: string; source: string }[] = [
+  { head: "SARKOZY TO TRIAL", badge: "OFFICIAL", source: "REUTERS" },
+  { head: "SOUTH KOREA MINISTER RESIGNS", badge: "OFFICIAL", source: "MULTIPLE OUTLETS" },
+  { head: "ISRAELI STRIKE IN GAZA", badge: "REPORTED", source: "DAILY DEBRIEF" },
+];
+
+function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string, maxWidth: number, gap = 4): number {
   const lines = wrap(s, scale, maxWidth);
   for (let i = 0; i < lines.length; i++) {
-    drawText(cv, x, y + i * (7 * scale + 4), scale, INK, lines[i], true);
+    drawText(cv, x, y + i * (7 * scale + gap), scale, INK, lines[i], true);
   }
-  return y + lines.length * (7 * scale + 4);
+  return y + lines.length * (7 * scale + gap);
 }
 
 function main(): void {
@@ -584,18 +650,21 @@ function main(): void {
   // Masthead. 13 stories on the page (3 leads + 4 secondary + 3 strip + 3 ticker)
   // across 10 fields: war, space, court, tech, human rights, energy, culture,
   // politics, games, sport. The two counts flank the dateline.
-  drawTextCentered(cv, W / 2, 22, 10, INK, "THE WORLD", true);
-  drawText(cv, 32, 100, 2, INK, "13 STORIES", true);
-  drawText(cv, 992 - textWidth("10 FIELDS", 2), 100, 2, INK, "10 FIELDS", true);
-  drawTextCentered(cv, W / 2, 100, 3, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
-  cv.rect(32, 128, W - 64, 5, RED);
-  cv.rect(32, 137, W - 64, 2, INK);
+  // Chunk C1: title at scale 9 (was 10) to free room for the badge lines
+  // and the 3-line ticker + legend in the footer.
+  drawTextCentered(cv, W / 2, 20, 9, INK, "THE WORLD", true);
+  drawText(cv, 32, 92, 2, INK, "13 STORIES", true);
+  drawText(cv, 992 - textWidth("10 FIELDS", 2), 92, 2, INK, "10 FIELDS", true);
+  drawTextCentered(cv, W / 2, 92, 3, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
+  cv.rect(32, 116, W - 64, 5, RED);
+  cv.rect(32, 124, W - 64, 2, INK);
 
   // Three leads in one row (Chunk B): 3 columns, each art on top, then
-  // headline, then a short summary. Column width 309, gap 16.
-  // Art 150-300, headlines 308-383 (3 lines max at scale 3), summaries
-  // 385-457 (4 lines max at scale 2, aligned across columns).
-  const leadY = 150;
+  // headline, then a short summary, then the verification badge (Chunk C1).
+  // Column width 309, gap 16. Art 132-282, headlines 290-359 (3 lines max
+  // at scale 3, gap 2), summaries dynamic (4-5 lines at scale 2, gap 2),
+  // badges right after each summary; worst badge bottom is 445.
+  const leadY = 132;
   const leadH = 150;
   const leadW = 309;
   for (let i = 0; i < LEADS.length; i++) {
@@ -603,37 +672,42 @@ function main(): void {
     const ld = LEADS[i];
     ld.art(cv, x, leadY, leadW, leadH);
     cv.frame(x, leadY, leadW, leadH, INK);
-    drawHeadline(cv, x, leadY + 158, 3, ld.head, leadW);
-    drawPara(cv, x, leadY + 235, 2, INK, ld.body, leadW, 4);
+    const hy = drawHeadline(cv, x, leadY + 158, 3, ld.head, leadW, 2);
+    const by = drawPara(cv, x, hy + 6, 2, INK, ld.body, leadW, 2);
+    drawBadge(cv, x, by + 2, ld.badge, ld.source);
   }
 
   // Secondary stories: 2 columns x 2 rows (4 stories left after the two
-  // promotions). Pitch 112: row 2 (Ahmadi) holds up to 108px of text.
-  drawText(cv, 32, 474, 2, INK, "MORE WORLD NEWS", true);
-  cv.rect(32, 494, W - 64, 2, INK);
+  // promotions). Body lineGap 2 (was 4) and badge after each body.
+  // Row 1 badge bottom ~563, divider 571; row 2 (Ahmadi, 4-line body)
+  // badge bottom ~709, numbers rule 715.
+  drawText(cv, 32, 453, 2, INK, "MORE WORLD NEWS", true);
+  cv.rect(32, 473, W - 64, 2, INK);
   const cellW = 468;
   const cellH = 100;
   for (let i = 0; i < SECONDARY.length; i++) {
     const col = i % 2;
     const row = Math.floor(i / 2);
     const x = 32 + col * (cellW + 24);
-    const y = 506 + row * 112;
+    const y = 479 + row * 112;
     const st = SECONDARY[i];
     cv.rect(x, y + 2, 48, 48, LIGHT);
     cv.frame(x, y + 2, 48, 48, INK);
     st.icon(cv, x, y + 2);
     const hx = x + 62;
     const hy = drawHeadline(cv, hx, y, 2, st.head, cellW - 62);
-    drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 4);
+    const by = drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 2);
+    drawBadge(cv, hx, by + 2, st.badge, st.source);
     if (row < 1) cv.rect(x, y + 92, cellW, 1, LIGHT);
   }
 
   // Numbers strip: 6 big numbers (see NUMBERS above for sources).
-  cv.rect(32, 738, W - 64, 2, INK);
+  // Chunk C1: scale 3 (was 4) to free room for the footer badge lines.
+  cv.rect(32, 715, W - 64, 2, INK);
   for (let i = 0; i < NUMBERS.length; i++) {
     const x = 32 + i * 160;
-    drawTextCentered(cv, x + 80, 746, 4, RED, NUMBERS[i].num, true);
-    drawTextCentered(cv, x + 80, 780, 2, INK, NUMBERS[i].label, true);
+    drawTextCentered(cv, x + 80, 723, 3, RED, NUMBERS[i].num, true);
+    drawTextCentered(cv, x + 80, 750, 2, INK, NUMBERS[i].label, true);
   }
 
   // Region strip: story count per region; the chips sum to the 13 in the
@@ -642,8 +716,8 @@ function main(): void {
   // AMERICAS 4 (Huawei US court, Microsoft, Thanksgiving, GTA 6).
   const chipW = 184;
   const chipGap = 8;
-  const chipY = 806;
-  const chipH = 28;
+  const chipY = 770;
+  const chipH = 24;
   const chips: { label: string; bg: RGB; fg: RGB }[] = [
     { label: "REGIONS", bg: INK, fg: WHITE },
     { label: "EUROPE 3", bg: NAVY, fg: WHITE },
@@ -654,30 +728,42 @@ function main(): void {
   for (let i = 0; i < chips.length; i++) {
     const x = 36 + i * (chipW + chipGap);
     cv.rect(x, chipY, chipW, chipH, chips[i].bg);
-    drawTextCentered(cv, x + chipW / 2, chipY + 7, 2, chips[i].fg, chips[i].label, true);
+    drawTextCentered(cv, x + chipW / 2, chipY + 5, 2, chips[i].fg, chips[i].label, true);
   }
 
-  // Bottom strip: lighter stories.
-  drawText(cv, 32, 846, 2, RED, "ALSO TODAY", true);
-  cv.rect(32, 866, W - 64, 2, INK);
+  // Bottom strip: lighter stories, badge after each body.
+  // Kick 830, headline 848-880 (2 lines, gap 2), body 882-914, badge 916-930.
+  drawText(cv, 32, 802, 2, RED, "ALSO TODAY", true);
+  cv.rect(32, 822, W - 64, 2, INK);
   const stripW = 304;
   for (let i = 0; i < STRIP.length; i++) {
     const x = 32 + i * (stripW + 16);
-    const y = 878;
+    const y = 830;
     drawText(cv, x, y, 2, RED, STRIP[i].kick, true);
-    const hy = drawHeadline(cv, x, y + 20, 2, STRIP[i].head, stripW);
-    drawPara(cv, x, hy + 2, 2, INK, STRIP[i].body, stripW, 4);
-    if (i < 2) cv.vline(x + stripW + 8, y, 84, LIGHT);
+    const hy = drawHeadline(cv, x, y + 18, 2, STRIP[i].head, stripW, 2);
+    const by = drawPara(cv, x, hy + 2, 2, INK, STRIP[i].body, stripW, 2);
+    drawBadge(cv, x, by + 2, STRIP[i].badge, STRIP[i].source);
+    if (i < 2) cv.vline(x + stripW + 8, y, 102, LIGHT);
   }
 
-  // Ticker + footer. The old "all stories first reported 25 Nov" line is
-  // gone: two lead facts are NOT 25 Nov events, so the footer says so
-  // honestly. Drone strike on the Russian ship: Saturday 21 Nov, confirmed
-  // by Zelenskiy 25 Nov. Libya warship claim: Monday 23 Nov.
-  cv.rect(32, 972, W - 64, 2, INK);
-  drawText(cv, 32, 980, 2, INK, "ALSO: SARKOZY TO TRIAL - SOUTH KOREA MINISTER RESIGNS - ISRAELI STRIKE IN GAZA", true);
-  drawText(cv, 32, 1000, 2, RED, "DATE CHECK:", true);
-  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 1000, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
+  // Ticker + footer (Chunk C1): each ticker story on its own line with its
+  // badge, then DATE CHECK, then the badge legend (scale 1, centred).
+  // Ticker rule 938; ticker lines 946/962/978 (pitch 16); DATE CHECK 996;
+  // legend 1014-1021 (7px text, 3px bottom margin).
+  // The old "all stories first reported 25 Nov" line is gone: two lead facts
+  // are NOT 25 Nov events, so the footer says so honestly. Drone strike on
+  // the Russian ship: Saturday 21 Nov, confirmed by Zelenskiy 25 Nov.
+  // Libya warship claim: Monday 23 Nov.
+  cv.rect(32, 938, W - 64, 2, INK);
+  for (let i = 0; i < TICKER.length; i++) {
+    const y = 946 + i * 16;
+    const tk = TICKER[i];
+    drawText(cv, 32, y, 2, INK, tk.head + " -", true);
+    drawBadge(cv, 32 + textWidth(tk.head + " - ", 2) + 8, y, tk.badge, tk.source);
+  }
+  drawText(cv, 32, 996, 2, RED, "DATE CHECK:", true);
+  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 996, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
+  drawTextCentered(cv, W / 2, 1014, 1, GREY, "OFFICIAL = ON THE RECORD - CONFIRMED = 2+ OUTLETS - REPORTED = ONE OUTLET");
 
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });

@@ -40,6 +40,25 @@ deterministically — two runs produce byte-identical output.
   Zelenskiy 25 Nov) and the Libya warship claim was Monday 23 Nov — neither
   is a 25 Nov event, and the footer says so.
 
+## Verification badges (Chunk C1)
+
+Every story carries a verification badge + source on its own small line
+(green = OFFICIAL, navy = CONFIRMED, red = REPORTED). Legend in the
+footer: OFFICIAL = on the record, CONFIRMED = 2+ outlets, REPORTED = one
+outlet. Badges follow the coordinator brief: official statements, verdicts
+and launches are OFFICIAL; Huawei/Ahmadi/Hormuz are CONFIRMED; the leaked
+Microsoft memo, GTA 6 and cricket are REPORTED; Gaza is REPORTED (Daily
+Debrief only). "MULTIPLE OUTLETS" is used where the brief names no outlet.
+
+- Leads: ship OFFICIAL - REUTERS; NATO OFFICIAL - WH NEWS; Shenzhou-24
+  OFFICIAL - MULTIPLE OUTLETS.
+- Secondary: Huawei OFFICIAL - REUTERS; Microsoft REPORTED - THE HINDU;
+  Ahmadi CONFIRMED - MULTIPLE OUTLETS; Hormuz CONFIRMED - MULTIPLE OUTLETS.
+- Also today: Thanksgiving OFFICIAL - MULTIPLE OUTLETS; GTA 6 REPORTED -
+  MULTIPLE OUTLETS; cricket REPORTED - MULTIPLE OUTLETS.
+- Ticker: Sarkozy OFFICIAL - REUTERS; South Korea OFFICIAL - MULTIPLE
+  OUTLETS; Gaza REPORTED - DAILY DEBRIEF.
+
 ## Run
 
 ```sh
