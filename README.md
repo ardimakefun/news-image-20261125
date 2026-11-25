@@ -46,7 +46,7 @@ Every story carries a verification badge + source on its own small line
 (green = OFFICIAL, navy = CONFIRMED, red = REPORTED). Legend in the
 footer: OFFICIAL = on the record, CONFIRMED = 2+ outlets, REPORTED = one
 outlet. Badges follow the coordinator brief: official statements, verdicts
-and launches are OFFICIAL; Huawei/Ahmadi/Hormuz are CONFIRMED; the leaked
+and launches are OFFICIAL; Ahmadi/Hormuz are CONFIRMED; the leaked
 Microsoft memo is REPORTED; GTA 6 and cricket are CONFIRMED (multiple
 outlets), not REPORTED — the legend defines REPORTED as one outlet only.
 Gaza is REPORTED (Daily Debrief only). "MULTIPLE OUTLETS" is used where
