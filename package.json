@@ -1,0 +1,1 @@
+{"description":"THE WORLD: Wednesday 25 November 2026 in one 1024x1024 newspaper front page image.","engines":{"node":">=22"},"license":"MIT","name":"news-image-20261125","private":true,"scripts":{"start":"node main.ts"},"type":"module","version":"1.0.0"}
