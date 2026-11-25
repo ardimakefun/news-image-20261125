@@ -532,7 +532,9 @@ function drawLeadArtRocket(cv: Canvas, x: number, y: number, w: number, h: numbe
 // Numbered pins (white ring + red disc + white number) mark only the
 // stories with a clear land location; NATO space defence (orbit) and GTA 6
 // (no event location) get no pin. Every pin centre sits on green land and
-// no two pin centres are closer than 27px (pin radius 11 incl. ring).
+// no two pin centres are closer than 35px (pin radius 16 incl. ring;
+// closest pair 1-13, 35.5px). Pins 1 and 6 were nudged a few px within
+// their countries (Finland, Iran) so the bigger pins still clear each other.
 const MAP_LAND: [number, number, number][] = [
   // North America (+ Central America isthmus)
   [140, 25, 14], [170, 32, 26], [220, 28, 30], [270, 32, 28], [310, 38, 20],
@@ -556,11 +558,11 @@ const MAP_LAND: [number, number, number][] = [
 ];
 // [story number, rel x, rel y] — locations from the verified brief only.
 const MAP_PINS: [number, number, number][] = [
-  [1, 554, 17], // ship strike: Gulf of Finland / Finland-Ukraine
+  [1, 552, 14], // ship strike: Gulf of Finland / Finland-Ukraine
   [3, 747, 34], // Shenzhou-24: China (launch site)
   [4, 283, 34], // Huawei: US court, east coast
   [5, 155, 28], // Microsoft: US west coast
-  [6, 598, 37], // Ahmadi: Iran (north-west)
+  [6, 606, 32], // Ahmadi: Iran (north-west)
   [7, 638, 52], // Hormuz: Oman coast by the Strait of Hormuz
   [8, 219, 36], // Thanksgiving: central US
   [10, 675, 56], // cricket: India
@@ -577,12 +579,12 @@ function drawWorldMap(cv: Canvas, x: number, y: number, w: number, h: number): v
   cv.rect(x + 32, y + 92, 218, 26, PAPER);
   cv.frame(x + 32, y + 92, 218, 26, INK);
   drawText(cv, x + 40, y + 98, 2, INK, "WHERE IT HAPPENED", true);
-  // Pins: white ring, red disc, white number (scale 1, centred).
+  // Pins: white ring (2px), red disc, white number (scale 1, centred).
   for (const [n, px, py] of MAP_PINS) {
     const cx = x + px;
     const cy = y + py;
-    cv.circle(cx, cy, 11, WHITE);
-    cv.circle(cx, cy, 10, RED);
+    cv.circle(cx, cy, 16, WHITE);
+    cv.circle(cx, cy, 14, RED);
     const s = String(n);
     drawText(cv, cx - Math.floor(textWidth(s, 1) / 2), cy - 3, 1, WHITE, s, true);
   }
@@ -831,20 +833,27 @@ function main(): void {
   // badge, then DATE CHECK, then the badge legend (scale 1, centred).
   // Chunk C2: ticker rule 944; ticker lines 950/966/982 (pitch 16);
   // DATE CHECK 998; legend 1015-1022 (2px bottom margin).
+  // Critic round 1: whole footer block lifted 3px (rule 941, ticker
+  // 947/963/979, DATE CHECK 995, legend 1011-1018) so the legend ends
+  // 6px above the bottom edge instead of 2px. All internal gaps kept:
+  // rule-to-badge 3px, ticker-to-DATE CHECK 2px, DATE CHECK-to-legend 2px.
+  // (A literal +1px font size is not possible here: the bitmap font only
+  // scales in whole steps, and DATE CHECK at scale 3 would be 1041px wide
+  // on a 960px text width; the lift + margin is the achievable form.)
   // The old "all stories first reported 25 Nov" line is gone: two lead facts
   // are NOT 25 Nov events, so the footer says so honestly. Drone strike on
   // the Russian ship: Saturday 21 Nov, confirmed by Zelenskiy 25 Nov.
   // Libya warship claim: Monday 23 Nov.
-  cv.rect(32, 944, W - 64, 2, INK);
+  cv.rect(32, 941, W - 64, 2, INK);
   for (let i = 0; i < TICKER.length; i++) {
-    const y = 950 + i * 16;
+    const y = 947 + i * 16;
     const tk = TICKER[i];
     drawText(cv, 32, y, 2, INK, tk.head + " -", true);
     drawBadge(cv, 32 + textWidth(tk.head + " - ", 2) + 8, y, tk.badge, tk.source);
   }
-  drawText(cv, 32, 998, 2, RED, "DATE CHECK:", true);
-  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 998, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
-  drawTextCentered(cv, W / 2, 1015, 1, GREY, "OFFICIAL = ON THE RECORD - CONFIRMED = 2+ OUTLETS - REPORTED = ONE OUTLET");
+  drawText(cv, 32, 995, 2, RED, "DATE CHECK:", true);
+  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 995, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
+  drawTextCentered(cv, W / 2, 1011, 1, GREY, "OFFICIAL = ON THE RECORD - CONFIRMED = 2+ OUTLETS - REPORTED = ONE OUTLET");
 
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });
