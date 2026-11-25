@@ -27,7 +27,7 @@ deterministically — two runs produce byte-identical output.
 
 ## Counts (Chunk A — all arithmetic must match)
 
-- **13 stories:** 1 lead + 6 secondary + 3 "Also today" + 3 in the ticker.
+- **13 stories:** 3 leads + 4 secondary + 3 "Also today" + 3 in the ticker.
 - **10 fields:** war, space, court, tech, human rights, energy, culture,
   politics, games, sport.
 - **Regions (sum 13):** Europe 3 (lead ship, NATO space, Sarkozy), Asia 3
@@ -58,6 +58,29 @@ Debrief only). "MULTIPLE OUTLETS" is used where the brief names no outlet.
   MULTIPLE OUTLETS; cricket REPORTED - MULTIPLE OUTLETS.
 - Ticker: Sarkozy OFFICIAL - REUTERS; South Korea OFFICIAL - MULTIPLE
   OUTLETS; Gaza REPORTED - DAILY DEBRIEF.
+
+## World map (Chunk C2)
+
+A full-width world-map band sits between the secondary grid and the numbers
+strip: continents drawn from scratch as unions of green discs on a light-blue
+ocean (no copied map), with numbered red pins for the stories that have a
+clear land location. The label "WHERE IT HAPPENED" sits in a chip inside
+the band, bottom left over the empty South Pacific.
+
+- **Pins (11):** 1 Gulf of Finland, 3 China, 4 US east coast, 5 US west
+  coast, 6 Iran, 7 Strait of Hormuz (Oman coast), 8 central US, 10 India,
+  11 France, 12 South Korea, 13 Gaza. Every pin centre is on land and no
+  two pins touch (closest pair 6–13, 27.9 px between centres).
+- **No pin:** 2 NATO (space defence, orbit — no land location) and 9 GTA 6
+  (no event location). Better no pin than an invented one.
+- **Room for the band:** lead art 150 → 100 px (the three scenes re-fitted:
+  ship hull/mast shortened, drones moved above the containers, rocket flame
+  shortened with smoke at its base, satellite moon/orbit kept in-frame),
+  masthead title scale 9 → 7, dateline scale 3 → 2, gaps tightened to
+  1–2 px. The band is 120 px tall, not 150: the page was already full
+  (1021/1024 px used) and a 150 px band would only fit by shrinking text
+  below its current sizes, which would hurt readability. No story, badge,
+  number, or region value was changed or removed.
 
 ## Run
 

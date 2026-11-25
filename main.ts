@@ -386,17 +386,25 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   const seaY = y + Math.floor(h * 0.58);
   cv.rect(x, y, w, seaY - y, SKY); // sky
   cv.rect(x, seaY, w, y + h - seaY, SEA); // sea
+  // Waves, drawn before the ship so the hull covers them (at h=100 the
+  // ship fills most of the sea; only the open-sea slivers show waves).
+  for (let i = 0; i < 2; i++) {
+    const wy = seaY + 14 + i * 18;
+    for (let wx = x + 12; wx < x + w - 12; wx += 36) {
+      cv.hline(wx, wy, 20, WHITE);
+    }
+  }
   // Sun + clouds.
   cv.circle(x + w - 52, y + 34, 20, SUN);
   cv.rect(x + 24, y + 26, 84, 14, WHITE);
   cv.rect(x + 44, y + 16, 54, 12, WHITE);
-  cv.rect(x + w - 190, y + 64, 70, 12, WHITE);
-  // Drones: three quadcopters, 1.5x the v1 size, flying high to fill the
-  // top third of the sky, with a bolder dotted approach line.
+  cv.rect(x + w - 190, y + 50, 70, 12, WHITE);
+  // Drones: three quadcopters flying high in the sky, above the containers
+  // (which start at y+24), with a bolder dotted approach line.
   const drones: [number, number][] = [
-    [x + 78, y + 46],
-    [x + 150, y + 30],
-    [x + 224, y + 52],
+    [x + 78, y + 12],
+    [x + 150, y + 11],
+    [x + 215, y + 16],
   ];
   for (let i = 0; i < drones.length; i++) {
     const [dx, dy] = drones[i];
@@ -419,7 +427,7 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   const sx = x + 8; // hull (286 wide) must fit a 309-wide lead column
   const hullY = seaY + 34;
   cv.rect(sx, hullY - 34, 286, 34, [30, 30, 30]); // hull
-  cv.tri(sx, hullY, sx + 286, hullY, sx + 257, hullY + 29, [30, 30, 30]);
+  cv.tri(sx, hullY, sx + 286, hullY, sx + 257, hullY + 8, [30, 30, 30]);
   cv.rect(sx, hullY - 34, 286, 5, RED); // deck stripe
   cv.rect(sx + 18, hullY - 68, 39, 34, [200, 60, 50]); // containers
   cv.rect(sx + 62, hullY - 68, 39, 34, [60, 120, 70]);
@@ -427,16 +435,9 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   cv.rect(sx + 151, hullY - 68, 39, 34, [70, 110, 160]);
   cv.rect(sx + 234, hullY - 75, 44, 41, WHITE); // bridge
   cv.rect(sx + 242, hullY - 68, 29, 10, NAVY);
-  cv.vline(sx + 255, hullY - 99, 24, INK); // mast
-  cv.rect(sx + 255, hullY - 99, 23, 13, RED); // flag
-  // Waves.
-  for (let i = 0; i < 5; i++) {
-    const wy = seaY + 14 + i * 18;
-    for (let wx = x + 12; wx < x + w - 12; wx += 36) {
-      cv.hline(wx, wy, 20, WHITE);
-    }
-  }
-  // Caption inside the sea.
+  cv.vline(sx + 255, hullY - 88, 24, INK); // mast
+  cv.rect(sx + 255, hullY - 88, 23, 13, RED); // flag
+  // Caption inside the sea (white on the dark hull below the waterline).
   drawText(cv, x + 14, y + h - 26, 2, WHITE, "GULF OF FINLAND", true);
 }
 
@@ -452,10 +453,10 @@ function drawLeadArtSatellite(cv: Canvas, x: number, y: number, w: number, h: nu
     [210, 56, 2], [70, 84, 2], [250, 84, 2], [160, 70, 2],
   ];
   for (const [sx, sy, r] of stars) cv.circle(x + sx, y + sy, r, WHITE);
-  cv.circle(x + 272, y + 96, 10, WHITE); // moon
-  cv.circle(x + 272, y + 96, 7, LIGHT);
-  // Orbit line (diagonal, behind the satellite).
-  cv.line(x + 8, y + 118, x + w - 8, y + 34, WHITE);
+  cv.circle(x + 272, y + 88, 10, WHITE); // moon
+  cv.circle(x + 272, y + 88, 7, LIGHT);
+  // Orbit line (diagonal, behind the satellite; kept inside the frame).
+  cv.line(x + 8, y + 96, x + w - 8, y + 34, WHITE);
   // Earth arc: big circle rising ~57px from the bottom edge (the part
   // below the frame is clipped by the PAPER rect below).
   cv.circle(x + 150, y + h + 28, 85, SEA);
@@ -497,24 +498,87 @@ function drawLeadArtRocket(cv: Canvas, x: number, y: number, w: number, h: numbe
   cv.rect(sx - 58, sy - 6, 26, 26, NAVY); // left panel
   cv.rect(sx + 78, sy - 6, 26, 26, NAVY); // right panel
   cv.rect(sx + 18, sy - 8, 8, 8, RED); // docking node
-  // Rocket, centre-left, climbing.
+  // Rocket, centre-left, climbing (ry lowered for the 100px frame; the
+  // flame is shortened so its tip ends exactly at the frame bottom).
   const rx = x + 96;
-  const ry = y + 34;
-  cv.tri(rx, ry + 62, rx + 12, ry + 62, rx + 6, ry + 96, SUN); // flame
-  cv.tri(rx + 4, ry + 62, rx + 8, ry + 62, rx + 6, ry + 82, RED);
+  const ry = y + 14;
+  cv.tri(rx, ry + 62, rx + 12, ry + 62, rx + 6, ry + 80, SUN); // flame
+  cv.tri(rx + 4, ry + 62, rx + 8, ry + 62, rx + 6, ry + 76, RED);
   cv.rect(rx - 6, ry + 18, 24, 46, WHITE); // body
   cv.rect(rx - 6, ry + 18, 24, 5, RED); // band
   cv.tri(rx - 6, ry + 18, rx + 18, ry + 18, rx + 6, ry, RED); // nose
   cv.circle(rx + 6, ry + 34, 5, NAVY); // window
   cv.tri(rx - 6, ry + 50, rx - 18, ry + 70, rx - 6, ry + 64, RED); // fin
   cv.tri(rx + 18, ry + 50, rx + 30, ry + 70, rx + 18, ry + 64, RED); // fin
-  // Smoke puffs below the flame.
-  cv.circle(rx - 8, y + h - 22, 12, WHITE);
-  cv.circle(rx + 20, y + h - 18, 14, WHITE);
-  cv.circle(rx + 6, y + h - 28, 10, LIGHT);
-  // Ground strip.
+  // Ground strip (before the smoke, so the puffs sit on it).
   cv.rect(x, y + h - 10, w, 10, GREEN);
+  // Smoke puffs flanking the base of the flame, on the ground strip.
+  cv.circle(rx - 10, y + h - 4, 8, WHITE);
+  cv.circle(rx + 22, y + h - 3, 9, WHITE);
   drawText(cv, x + 12, y + h - 26, 2, INK, "TIANGONG", true);
+}
+
+// --------------------------------------- world map band (Chunk C2)
+// Original geometric world map: continents as unions of green discs on a
+// light-blue ocean, drawn from scratch (no copied map). Band-relative
+// coordinates: x 0..960 (lon -180..+180), y 0..120 (lat ~75N..-55S).
+// Numbered pins (white ring + red disc + white number) mark only the
+// stories with a clear land location; NATO space defence (orbit) and GTA 6
+// (no event location) get no pin. Every pin centre sits on green land and
+// no two pin centres are closer than 27px (pin radius 11 incl. ring).
+const MAP_LAND: [number, number, number][] = [
+  // North America (+ Central America isthmus)
+  [140, 25, 14], [170, 32, 26], [220, 28, 30], [270, 32, 28], [310, 38, 20],
+  [190, 50, 22], [240, 52, 24], [285, 55, 18], [150, 45, 16], [320, 55, 12],
+  [280, 78, 9],
+  // South America
+  [250, 85, 20], [265, 105, 16], [245, 120, 10],
+  // Europe (+ Iceland, Greenland)
+  [465, 8, 5], [490, 22, 18], [515, 28, 16], [540, 18, 14], [555, 16, 12],
+  [500, 40, 12], [555, 30, 12], [575, 32, 10], [330, 8, 12],
+  // Africa
+  [490, 65, 22], [510, 85, 20], [495, 105, 14], [520, 60, 14], [470, 75, 12],
+  // Asia
+  [600, 30, 20], [640, 32, 22], [680, 30, 20], [720, 28, 22], [760, 32, 22],
+  [800, 30, 20], [840, 35, 18], [620, 45, 16], [660, 48, 16], [700, 50, 18],
+  [740, 45, 16], [780, 45, 14], [820, 50, 14], [860, 55, 10], [580, 45, 12],
+  [680, 58, 16], [690, 70, 12], [825, 38, 14],
+  // Australia + SE Asia islands + Japan
+  [820, 100, 16], [845, 105, 14], [800, 100, 10], [790, 75, 8], [810, 80, 7],
+  [865, 40, 6],
+];
+// [story number, rel x, rel y] — locations from the verified brief only.
+const MAP_PINS: [number, number, number][] = [
+  [1, 554, 17], // ship strike: Gulf of Finland / Finland-Ukraine
+  [3, 747, 34], // Shenzhou-24: China (launch site)
+  [4, 283, 34], // Huawei: US court, east coast
+  [5, 155, 28], // Microsoft: US west coast
+  [6, 598, 37], // Ahmadi: Iran (north-west)
+  [7, 638, 52], // Hormuz: Oman coast by the Strait of Hormuz
+  [8, 219, 36], // Thanksgiving: central US
+  [10, 675, 56], // cricket: India
+  [11, 485, 26], // Sarkozy: France
+  [12, 819, 38], // South Korea
+  [13, 571, 44], // Gaza
+];
+
+function drawWorldMap(cv: Canvas, x: number, y: number, w: number, h: number): void {
+  cv.rect(x, y, w, h, SKY); // ocean
+  for (const [cx, cy, r] of MAP_LAND) cv.circle(x + cx, y + cy, r, GREEN);
+  cv.frame(x, y, w, h, INK);
+  // Label chip, bottom left over the empty South Pacific (no pin there).
+  cv.rect(x + 32, y + 92, 218, 26, PAPER);
+  cv.frame(x + 32, y + 92, 218, 26, INK);
+  drawText(cv, x + 40, y + 98, 2, INK, "WHERE IT HAPPENED", true);
+  // Pins: white ring, red disc, white number (scale 1, centred).
+  for (const [n, px, py] of MAP_PINS) {
+    const cx = x + px;
+    const cy = y + py;
+    cv.circle(cx, cy, 11, WHITE);
+    cv.circle(cx, cy, 10, RED);
+    const s = String(n);
+    drawText(cv, cx - Math.floor(textWidth(s, 1) / 2), cy - 3, 1, WHITE, s, true);
+  }
 }
 
 // ------------------------------------------------------------------ layout
@@ -652,62 +716,70 @@ function main(): void {
   // politics, games, sport. The two counts flank the dateline.
   // Chunk C1: title at scale 9 (was 10) to free room for the badge lines
   // and the 3-line ticker + legend in the footer.
-  drawTextCentered(cv, W / 2, 20, 9, INK, "THE WORLD", true);
-  drawText(cv, 32, 92, 2, INK, "13 STORIES", true);
-  drawText(cv, 992 - textWidth("10 FIELDS", 2), 92, 2, INK, "10 FIELDS", true);
-  drawTextCentered(cv, W / 2, 92, 3, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
-  cv.rect(32, 116, W - 64, 5, RED);
-  cv.rect(32, 124, W - 64, 2, INK);
+  // Chunk C2: title scale 7, dateline scale 2, rules up — the page is full
+  // and the world-map band below needs the room; nothing is dropped.
+  drawTextCentered(cv, W / 2, 12, 7, INK, "THE WORLD", true);
+  drawText(cv, 32, 66, 2, INK, "13 STORIES", true);
+  drawText(cv, 992 - textWidth("10 FIELDS", 2), 66, 2, INK, "10 FIELDS", true);
+  drawTextCentered(cv, W / 2, 66, 2, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
+  cv.rect(32, 86, W - 64, 5, RED);
+  cv.rect(32, 94, W - 64, 2, INK);
 
   // Three leads in one row (Chunk B): 3 columns, each art on top, then
   // headline, then a short summary, then the verification badge (Chunk C1).
-  // Column width 309, gap 16. Art 132-282, headlines 290-359 (3 lines max
-  // at scale 3, gap 2), summaries dynamic (4-5 lines at scale 2, gap 2),
-  // badges right after each summary; worst badge bottom is 445.
-  const leadY = 132;
-  const leadH = 150;
+  // Chunk C2: art 100 tall (was 150; the three scenes are re-fitted above),
+  // gaps tightened to 1-2px. Column width 309, gap 16. Art 102-202,
+  // headlines 208-274 (3 lines max), summaries dynamic (4-5 lines),
+  // badges right after each summary; worst badge bottom is 352.
+  const leadY = 102;
+  const leadH = 100;
   const leadW = 309;
   for (let i = 0; i < LEADS.length; i++) {
     const x = 32 + i * (leadW + 16);
     const ld = LEADS[i];
     ld.art(cv, x, leadY, leadW, leadH);
     cv.frame(x, leadY, leadW, leadH, INK);
-    const hy = drawHeadline(cv, x, leadY + 158, 3, ld.head, leadW, 2);
-    const by = drawPara(cv, x, hy + 6, 2, INK, ld.body, leadW, 2);
-    drawBadge(cv, x, by + 2, ld.badge, ld.source);
+    const hy = drawHeadline(cv, x, leadY + 106, 3, ld.head, leadW, 1);
+    const by = drawPara(cv, x, hy + 2, 2, INK, ld.body, leadW, 1);
+    drawBadge(cv, x, by + 1, ld.badge, ld.source);
   }
 
   // Secondary stories: 2 columns x 2 rows (4 stories left after the two
-  // promotions). Body lineGap 2 (was 4) and badge after each body.
-  // Row 1 badge bottom ~563, divider 571; row 2 (Ahmadi, 4-line body)
-  // badge bottom ~709, numbers rule 715.
-  drawText(cv, 32, 453, 2, INK, "MORE WORLD NEWS", true);
-  cv.rect(32, 473, W - 64, 2, INK);
+  // promotions). Chunk C2: rows at 386/490 (pitch 104), headline gap 2,
+  // body lineGap 1, badge 1px after the body; row-0 divider kept at y+92.
+  // Row 1 (Ahmadi, 4-line body) badge bottom is 599.
+  drawText(cv, 32, 358, 2, INK, "MORE WORLD NEWS", true);
+  cv.rect(32, 378, W - 64, 2, INK);
   const cellW = 468;
   const cellH = 100;
   for (let i = 0; i < SECONDARY.length; i++) {
     const col = i % 2;
     const row = Math.floor(i / 2);
     const x = 32 + col * (cellW + 24);
-    const y = 479 + row * 112;
+    const y = 386 + row * 104;
     const st = SECONDARY[i];
     cv.rect(x, y + 2, 48, 48, LIGHT);
     cv.frame(x, y + 2, 48, 48, INK);
     st.icon(cv, x, y + 2);
     const hx = x + 62;
-    const hy = drawHeadline(cv, hx, y, 2, st.head, cellW - 62);
-    const by = drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 2);
-    drawBadge(cv, hx, by + 2, st.badge, st.source);
+    const hy = drawHeadline(cv, hx, y, 2, st.head, cellW - 62, 2);
+    const by = drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 1);
+    drawBadge(cv, hx, by + 1, st.badge, st.source);
     if (row < 1) cv.rect(x, y + 92, cellW, 1, LIGHT);
   }
 
+  // World map band (Chunk C2): original geometric map + numbered pins,
+  // 608-728 (120 tall). Label chip inside, bottom left over the empty
+  // South Pacific. Pins only for stories with a clear land location.
+  drawWorldMap(cv, 32, 608, W - 64, 120);
+
   // Numbers strip: 6 big numbers (see NUMBERS above for sources).
   // Chunk C1: scale 3 (was 4) to free room for the footer badge lines.
-  cv.rect(32, 715, W - 64, 2, INK);
+  cv.rect(32, 736, W - 64, 2, INK);
   for (let i = 0; i < NUMBERS.length; i++) {
     const x = 32 + i * 160;
-    drawTextCentered(cv, x + 80, 723, 3, RED, NUMBERS[i].num, true);
-    drawTextCentered(cv, x + 80, 750, 2, INK, NUMBERS[i].label, true);
+    drawTextCentered(cv, x + 80, 744, 3, RED, NUMBERS[i].num, true);
+    drawTextCentered(cv, x + 80, 769, 2, INK, NUMBERS[i].label, true);
   }
 
   // Region strip: story count per region; the chips sum to the 13 in the
@@ -716,8 +788,8 @@ function main(): void {
   // AMERICAS 4 (Huawei US court, Microsoft, Thanksgiving, GTA 6).
   const chipW = 184;
   const chipGap = 8;
-  const chipY = 770;
-  const chipH = 24;
+  const chipY = 788;
+  const chipH = 22;
   const chips: { label: string; bg: RGB; fg: RGB }[] = [
     { label: "REGIONS", bg: INK, fg: WHITE },
     { label: "EUROPE 3", bg: NAVY, fg: WHITE },
@@ -728,42 +800,44 @@ function main(): void {
   for (let i = 0; i < chips.length; i++) {
     const x = 36 + i * (chipW + chipGap);
     cv.rect(x, chipY, chipW, chipH, chips[i].bg);
-    drawTextCentered(cv, x + chipW / 2, chipY + 5, 2, chips[i].fg, chips[i].label, true);
+    drawTextCentered(cv, x + chipW / 2, chipY + 4, 2, chips[i].fg, chips[i].label, true);
   }
 
   // Bottom strip: lighter stories, badge after each body.
-  // Kick 830, headline 848-880 (2 lines, gap 2), body 882-914, badge 916-930.
-  drawText(cv, 32, 802, 2, RED, "ALSO TODAY", true);
-  cv.rect(32, 822, W - 64, 2, INK);
+  // Chunk C2: kick 846, headline 861-891 (2 lines, gap 1), body 892-922,
+  // badge 923-937; column dividers shortened to 96 so they stop above the
+  // ticker rule.
+  drawText(cv, 32, 818, 2, RED, "ALSO TODAY", true);
+  cv.rect(32, 838, W - 64, 2, INK);
   const stripW = 304;
   for (let i = 0; i < STRIP.length; i++) {
     const x = 32 + i * (stripW + 16);
-    const y = 830;
+    const y = 846;
     drawText(cv, x, y, 2, RED, STRIP[i].kick, true);
-    const hy = drawHeadline(cv, x, y + 18, 2, STRIP[i].head, stripW, 2);
-    const by = drawPara(cv, x, hy + 2, 2, INK, STRIP[i].body, stripW, 2);
-    drawBadge(cv, x, by + 2, STRIP[i].badge, STRIP[i].source);
-    if (i < 2) cv.vline(x + stripW + 8, y, 102, LIGHT);
+    const hy = drawHeadline(cv, x, y + 15, 2, STRIP[i].head, stripW, 1);
+    const by = drawPara(cv, x, hy + 1, 2, INK, STRIP[i].body, stripW, 1);
+    drawBadge(cv, x, by + 1, STRIP[i].badge, STRIP[i].source);
+    if (i < 2) cv.vline(x + stripW + 8, y, 96, LIGHT);
   }
 
   // Ticker + footer (Chunk C1): each ticker story on its own line with its
   // badge, then DATE CHECK, then the badge legend (scale 1, centred).
-  // Ticker rule 938; ticker lines 946/962/978 (pitch 16); DATE CHECK 996;
-  // legend 1014-1021 (7px text, 3px bottom margin).
+  // Chunk C2: ticker rule 944; ticker lines 950/966/982 (pitch 16);
+  // DATE CHECK 998; legend 1015-1022 (2px bottom margin).
   // The old "all stories first reported 25 Nov" line is gone: two lead facts
   // are NOT 25 Nov events, so the footer says so honestly. Drone strike on
   // the Russian ship: Saturday 21 Nov, confirmed by Zelenskiy 25 Nov.
   // Libya warship claim: Monday 23 Nov.
-  cv.rect(32, 938, W - 64, 2, INK);
+  cv.rect(32, 944, W - 64, 2, INK);
   for (let i = 0; i < TICKER.length; i++) {
-    const y = 946 + i * 16;
+    const y = 950 + i * 16;
     const tk = TICKER[i];
     drawText(cv, 32, y, 2, INK, tk.head + " -", true);
     drawBadge(cv, 32 + textWidth(tk.head + " - ", 2) + 8, y, tk.badge, tk.source);
   }
-  drawText(cv, 32, 996, 2, RED, "DATE CHECK:", true);
-  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 996, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
-  drawTextCentered(cv, W / 2, 1014, 1, GREY, "OFFICIAL = ON THE RECORD - CONFIRMED = 2+ OUTLETS - REPORTED = ONE OUTLET");
+  drawText(cv, 32, 998, 2, RED, "DATE CHECK:", true);
+  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 998, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
+  drawTextCentered(cv, W / 2, 1015, 1, GREY, "OFFICIAL = ON THE RECORD - CONFIRMED = 2+ OUTLETS - REPORTED = ONE OUTLET");
 
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });
