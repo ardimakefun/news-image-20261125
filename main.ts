@@ -336,6 +336,15 @@ function iconTanker(cv: Canvas, x: number, y: number): void {
   cv.circle(x + 36, y + 40, 3, INK);
 }
 
+function iconMusic(cv: Canvas, x: number, y: number): void {
+  // Quaver (eighth note): head + stem + red flag.
+  cv.circle(x + 17, y + 36, 6, INK); // note head
+  cv.rect(x + 21, y + 10, 4, 27, INK); // stem
+  cv.tri(x + 25, y + 10, x + 40, y + 17, x + 25, y + 21, RED); // flag
+  cv.circle(x + 38, y + 38, 2, INK);
+  cv.circle(x + 8, y + 12, 2, INK);
+}
+
 // -------------------------------------------- lead illustration: ship + drones
 function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): void {
   const seaY = y + Math.floor(h * 0.58);
@@ -346,39 +355,44 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   cv.rect(x + 24, y + 26, 84, 14, WHITE);
   cv.rect(x + 44, y + 16, 54, 12, WHITE);
   cv.rect(x + w - 190, y + 64, 70, 12, WHITE);
-  // Drones: three small quadcopters with a dashed approach line.
+  // Drones: three quadcopters, 1.5x the v1 size, flying high to fill the
+  // top third of the sky, with a bolder dotted approach line.
   const drones: [number, number][] = [
-    [x + 90, y + 78],
-    [x + 150, y + 56],
-    [x + 210, y + 88],
+    [x + 78, y + 46],
+    [x + 150, y + 30],
+    [x + 224, y + 52],
   ];
   for (let i = 0; i < drones.length; i++) {
     const [dx, dy] = drones[i];
-    cv.rect(dx - 7, dy - 3, 14, 6, INK);
-    cv.circle(dx - 10, dy - 5, 3, INK);
-    cv.circle(dx + 10, dy - 5, 3, INK);
-    cv.circle(dx - 10, dy + 5, 3, INK);
-    cv.circle(dx + 10, dy + 5, 3, INK);
+    cv.rect(dx - 10, dy - 4, 21, 9, INK);
+    cv.circle(dx - 15, dy - 7, 4, INK);
+    cv.circle(dx + 15, dy - 7, 4, INK);
+    cv.circle(dx - 15, dy + 7, 4, INK);
+    cv.circle(dx + 15, dy + 7, 4, INK);
     if (i > 0) {
       const [px, py] = drones[i - 1];
-      for (let t = 1; t < 8; t++) {
-        cv.px(Math.round(px + ((dx - px) * t) / 8), Math.round(py + ((dy - py) * t) / 8), INK);
+      for (let t = 1; t < 12; t++) {
+        const qx = Math.round(px + ((dx - px) * t) / 12);
+        const qy = Math.round(py + ((dy - py) * t) / 12);
+        cv.rect(qx, qy, 2, 2, INK);
       }
     }
   }
-  // Cargo ship on the sea.
+  // Cargo ship on the sea, ~1.3x the v1 size (all offsets from the bow
+  // origin sx, scaled by 1.3; hull baseline hullY unchanged).
+  const sx = x + 52;
   const hullY = seaY + 34;
-  cv.rect(x + 52, hullY - 26, 220, 26, [30, 30, 30]); // hull
-  cv.tri(x + 52, hullY, x + 272, hullY, x + 250, hullY + 22, [30, 30, 30]);
-  cv.rect(x + 52, hullY - 26, 220, 4, RED); // deck stripe
-  cv.rect(x + 66, hullY - 52, 30, 26, [200, 60, 50]); // containers
-  cv.rect(x + 100, hullY - 52, 30, 26, [60, 120, 70]);
-  cv.rect(x + 134, hullY - 52, 30, 26, [210, 170, 60]);
-  cv.rect(x + 168, hullY - 52, 30, 26, [70, 110, 160]);
-  cv.rect(x + 232, hullY - 58, 34, 32, WHITE); // bridge
-  cv.rect(x + 238, hullY - 52, 22, 8, NAVY);
-  cv.vline(x + 248, hullY - 76, 18, INK); // mast
-  cv.rect(x + 248, hullY - 76, 18, 10, RED); // flag
+  cv.rect(sx, hullY - 34, 286, 34, [30, 30, 30]); // hull
+  cv.tri(sx, hullY, sx + 286, hullY, sx + 257, hullY + 29, [30, 30, 30]);
+  cv.rect(sx, hullY - 34, 286, 5, RED); // deck stripe
+  cv.rect(sx + 18, hullY - 68, 39, 34, [200, 60, 50]); // containers
+  cv.rect(sx + 62, hullY - 68, 39, 34, [60, 120, 70]);
+  cv.rect(sx + 107, hullY - 68, 39, 34, [210, 170, 60]);
+  cv.rect(sx + 151, hullY - 68, 39, 34, [70, 110, 160]);
+  cv.rect(sx + 234, hullY - 75, 44, 41, WHITE); // bridge
+  cv.rect(sx + 242, hullY - 68, 29, 10, NAVY);
+  cv.vline(sx + 255, hullY - 99, 24, INK); // mast
+  cv.rect(sx + 255, hullY - 99, 23, 13, RED); // flag
   // Waves.
   for (let i = 0; i < 5; i++) {
     const wy = seaY + 14 + i * 18;
@@ -419,9 +433,9 @@ const SECONDARY: Story[] = [
     body: "CHINA LAUNCHES A CREW TO ITS SPACE STATION, CARRYING THE FIRST PAKISTANI ASTRONAUT, THE FIRST FOREIGNER ABOARD.",
   },
   {
-    icon: iconBurst,
-    head: "ISRAELI STRIKE KILLS HAMAS OFFICIAL",
-    body: "AN ISRAELI AIRSTRIKE IN GAZA KILLS A HAMAS OFFICIAL AS THE CONFLICT CONTINUES.",
+    icon: iconMusic,
+    head: "SINGER FLOGGED 74 LASHES AFTER YOUTUBE CONCERT",
+    body: "IRAN SENTENCES SINGER PARASTOO AHMADI TO 74 LASHES FOR PERFORMING WITHOUT A HEADSCARF IN AN ONLINE CONCERT.",
   },
   {
     icon: iconTanker,
@@ -472,7 +486,7 @@ function main(): void {
   cv.frame(32, leadY, 438, leadH, INK);
   const tx = 492;
   drawText(cv, tx, leadY + 4, 2, RED, "LEAD STORY - UKRAINE WAR", true);
-  drawText(cv, tx, leadY + 30, 4, INK, "UKRAINE HITS", true);
+  drawText(cv, tx, leadY + 30, 4, INK, "ZELENSKIY: WE HIT", true);
   drawText(cv, tx, leadY + 62, 4, INK, "RUSSIAN SHIP", true);
   cv.rect(tx, leadY + 102, 500, 2, INK);
   drawPara(
@@ -523,7 +537,7 @@ function main(): void {
 
   // Ticker + footer.
   cv.rect(32, 944, W - 64, 2, INK);
-  drawText(cv, 32, 954, 2, INK, "ALSO: SARKOZY TO TRIAL - SOUTH KOREA MINISTER RESIGNS - O'HARE RADAR DELAYS", true);
+  drawText(cv, 32, 954, 2, INK, "ALSO: SARKOZY TO TRIAL - SOUTH KOREA MINISTER RESIGNS - ISRAELI STRIKE IN GAZA", true);
   drawTextCentered(cv, W / 2, 980, 2, GREY, "ALL STORIES FIRST REPORTED ON WEDNESDAY, 25 NOVEMBER 2026");
 
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";

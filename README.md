@@ -11,18 +11,19 @@ deterministically — two runs produce byte-identical output.
 
 ## The page
 
-- **Lead:** Ukraine hits Russian ship — Zelenskiy confirms Ukraine was
+- **Lead:** "Zelenskiy: we hit Russian ship" — Zelenskiy confirms Ukraine was
   behind Saturday's drone strike on a Russian cargo ship in the Gulf of
   Finland; Norway urges caution; Kyiv also claims it sank a Russian
   warship off Libya on Monday.
 - **More world news:** NATO vows space defence, Huawei convicted in a US
   court, Microsoft declares "Code Red", Shenzhou-24 launches to Tiangong,
-  Israeli strike kills a Hamas official in Gaza, Iran rejects US talks as
+  Iran sentences singer Parastoo Ahmadi to 74 lashes for performing
+  without a headscarf in an online concert, Iran rejects US talks as
   mines hit tankers in Hormuz.
 - **Also today:** Trump pardons turkeys "Freedom" and "Feathers", GTA 6
   reaches 39 million PS5 players in 4 days, Suryavanshi (15) smashes a
   world-record 204* — plus Sarkozy to trial, South Korea's minister
-  resigns, and O'Hare radar delays.
+  resigns, and an Israeli strike in Gaza.
 
 ## Run
 
