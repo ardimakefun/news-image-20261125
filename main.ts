@@ -456,7 +456,11 @@ function drawLeadArtSatellite(cv: Canvas, x: number, y: number, w: number, h: nu
   cv.circle(x + 272, y + 88, 10, WHITE); // moon
   cv.circle(x + 272, y + 88, 7, LIGHT);
   // Orbit line (diagonal, behind the satellite; kept inside the frame).
-  cv.line(x + 8, y + 96, x + w - 8, y + 34, WHITE);
+  // It runs above the "EARTH ORBIT" caption (y+74..88): the old line
+  // (y+96 -> y+34) sliced through the caption's letters. This one passes
+  // through the satellite centre (x+128, y+52) and stays >=4px above the
+  // caption's top edge across its whole width.
+  cv.line(x + 8, y + 70, x + w - 8, y + 30, WHITE);
   // Earth arc: big circle rising ~57px from the bottom edge (the part
   // below the frame is clipped by the PAPER rect below).
   cv.circle(x + 150, y + h + 28, 85, SEA);
@@ -515,7 +519,10 @@ function drawLeadArtRocket(cv: Canvas, x: number, y: number, w: number, h: numbe
   // Smoke puffs flanking the base of the flame, on the ground strip.
   cv.circle(rx - 10, y + h - 4, 8, WHITE);
   cv.circle(rx + 22, y + h - 3, 9, WHITE);
-  drawText(cv, x + 12, y + h - 26, 2, INK, "TIANGONG", true);
+  // Caption sits right of the rocket (x+128): at x+12 the flame/fin
+  // covered the final G, reading "TIANGON". Clear sky here, below the
+  // station and clear of the smoke puffs (right puff ends at x+127).
+  drawText(cv, x + 128, y + h - 26, 2, INK, "TIANGONG", true);
 }
 
 // --------------------------------------- world map band (Chunk C2)
@@ -608,7 +615,7 @@ const SECONDARY: Story[] = [
   {
     icon: iconMusic,
     head: "SINGER FLOGGED 74 LASHES AFTER YOUTUBE CONCERT",
-    body: "IRAN SENTENCES SINGER PARASTOO AHMADI TO 74 LASHES FOR PERFORMING WITHOUT A HEADSCARF IN AN ONLINE CONCERT.",
+    body: "IRAN SENTENCES SINGER PARASTOO AHMADI TO 74 LASHES FOR PERFORMING IN AN ONLINE CONCERT.",
     badge: "CONFIRMED",
     source: "MULTIPLE OUTLETS",
   },
@@ -633,14 +640,14 @@ const STRIP: { kick: string; head: string; body: string; badge: string; source: 
     kick: "GAMES",
     head: "GTA 6: 39 MILLION PS5 PLAYERS IN 4 DAYS",
     body: "BIGGEST SONY LAUNCH IN 30 YEARS.",
-    badge: "REPORTED",
+    badge: "CONFIRMED",
     source: "MULTIPLE OUTLETS",
   },
   {
     kick: "SPORT",
     head: "SURYAVANSHI, 15, SMASHES RECORD 204*",
     body: "204 OFF 53 BALLS, A WORLD RECORD.",
-    badge: "REPORTED",
+    badge: "CONFIRMED",
     source: "MULTIPLE OUTLETS",
   },
 ];
@@ -654,7 +661,7 @@ const NUMBERS: { num: string; label: string }[] = [
   { num: "74", label: "LASHES" },
   { num: "39M", label: "GTA 6 PLAYERS" },
   { num: "204*", label: "RUNS, AGE 15" },
-  { num: "53", label: "BALLS, 204*" },
+  { num: "53", label: "BALLS" },
   { num: "3", label: "TANKERS HIT" },
   { num: "2027", label: "SARKOZY TRIAL" },
 ];

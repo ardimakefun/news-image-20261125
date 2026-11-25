@@ -18,7 +18,7 @@ deterministically — two runs produce byte-identical output.
 - **More world news:** NATO vows space defence, Huawei convicted in a US
   court, Microsoft declares "Code Red", Shenzhou-24 launches to Tiangong,
   Iran sentences singer Parastoo Ahmadi to 74 lashes for performing
-  without a headscarf in an online concert, Iran rejects US talks as
+  in an online concert, Iran rejects US talks as
   mines hit tankers in Hormuz.
 - **Also today:** Trump pardons turkeys "Freedom" and "Feathers", GTA 6
   reaches 39 million PS5 players in 4 days, Suryavanshi (15) smashes a
@@ -47,15 +47,17 @@ Every story carries a verification badge + source on its own small line
 footer: OFFICIAL = on the record, CONFIRMED = 2+ outlets, REPORTED = one
 outlet. Badges follow the coordinator brief: official statements, verdicts
 and launches are OFFICIAL; Huawei/Ahmadi/Hormuz are CONFIRMED; the leaked
-Microsoft memo, GTA 6 and cricket are REPORTED; Gaza is REPORTED (Daily
-Debrief only). "MULTIPLE OUTLETS" is used where the brief names no outlet.
+Microsoft memo is REPORTED; GTA 6 and cricket are CONFIRMED (multiple
+outlets), not REPORTED — the legend defines REPORTED as one outlet only.
+Gaza is REPORTED (Daily Debrief only). "MULTIPLE OUTLETS" is used where
+the brief names no outlet.
 
 - Leads: ship OFFICIAL - REUTERS; NATO OFFICIAL - WH NEWS; Shenzhou-24
   OFFICIAL - MULTIPLE OUTLETS.
 - Secondary: Huawei OFFICIAL - REUTERS; Microsoft REPORTED - THE HINDU;
   Ahmadi CONFIRMED - MULTIPLE OUTLETS; Hormuz CONFIRMED - MULTIPLE OUTLETS.
-- Also today: Thanksgiving OFFICIAL - MULTIPLE OUTLETS; GTA 6 REPORTED -
-  MULTIPLE OUTLETS; cricket REPORTED - MULTIPLE OUTLETS.
+- Also today: Thanksgiving OFFICIAL - MULTIPLE OUTLETS; GTA 6 CONFIRMED -
+  MULTIPLE OUTLETS; cricket CONFIRMED - MULTIPLE OUTLETS.
 - Ticker: Sarkozy OFFICIAL - REUTERS; South Korea OFFICIAL - MULTIPLE
   OUTLETS; Gaza REPORTED - DAILY DEBRIEF.
 
