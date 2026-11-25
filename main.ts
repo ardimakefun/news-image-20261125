@@ -532,8 +532,8 @@ function drawLeadArtRocket(cv: Canvas, x: number, y: number, w: number, h: numbe
 // Numbered pins (white ring + red disc + white number) mark only the
 // stories with a clear land location; NATO space defence (orbit) and GTA 6
 // (no event location) get no pin. Every pin centre sits on green land and
-// no two pin centres are closer than 35px (pin radius 16 incl. ring;
-// closest pair 1-13, 35.5px). Pins 1 and 6 were nudged a few px within
+// no two pin centres are closer than 33px (pin radius 16 incl. ring;
+// closest pair 1-13, 33.0px). Pins 1 and 6 were nudged a few px within
 // their countries (Finland, Iran) so the bigger pins still clear each other.
 const MAP_LAND: [number, number, number][] = [
   // North America (+ Central America isthmus)
@@ -558,7 +558,7 @@ const MAP_LAND: [number, number, number][] = [
 ];
 // [story number, rel x, rel y] — locations from the verified brief only.
 const MAP_PINS: [number, number, number][] = [
-  [1, 552, 14], // ship strike: Gulf of Finland / Finland-Ukraine
+  [1, 552, 17], // ship strike: Gulf of Finland / Finland-Ukraine
   [3, 747, 34], // Shenzhou-24: China (launch site)
   [4, 283, 34], // Huawei: US court, east coast
   [5, 155, 28], // Microsoft: US west coast

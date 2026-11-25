@@ -72,7 +72,7 @@ the band, bottom left over the empty South Pacific.
 - **Pins (11):** 1 Gulf of Finland, 3 China, 4 US east coast, 5 US west
   coast, 6 Iran, 7 Strait of Hormuz (Oman coast), 8 central US, 10 India,
   11 France, 12 South Korea, 13 Gaza. Every pin centre is on land and no
-  two pins touch (closest pair 1–13, 35.5 px between centres; pins 32 px
+  two pins touch (closest pair 1–13, 33.0 px between centres; pins 32 px
   diameter with a 2 px white ring).
 - **No pin:** 2 NATO (space defence, orbit — no land location) and 9 GTA 6
   (no event location). Better no pin than an invented one.
