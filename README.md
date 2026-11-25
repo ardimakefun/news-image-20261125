@@ -25,6 +25,21 @@ deterministically — two runs produce byte-identical output.
   world-record 204* — plus Sarkozy to trial, South Korea's minister
   resigns, and an Israeli strike in Gaza.
 
+## Counts (Chunk A — all arithmetic must match)
+
+- **13 stories:** 1 lead + 6 secondary + 3 "Also today" + 3 in the ticker.
+- **10 fields:** war, space, court, tech, human rights, energy, culture,
+  politics, games, sport.
+- **Regions (sum 13):** Europe 3 (lead ship, NATO space, Sarkozy), Asia 3
+  (Shenzhou, cricket, South Korea), Middle East 3 (Ahmadi, Hormuz, Gaza),
+  Americas 4 (Huawei US court, Microsoft, Thanksgiving, GTA 6).
+- **Numbers strip (all from stories on the page):** 74 lashes (Ahmadi),
+  39M GTA 6 PS5 players, 204\* Suryavanshi runs, 53 balls for that 204\*,
+  3 tankers hit in Hormuz, 2027 (Sarkozy trial, 1 Apr 2027).
+- **DATE CHECK:** the ship drone strike was Saturday 21 Nov (confirmed by
+  Zelenskiy 25 Nov) and the Libya warship claim was Monday 23 Nov — neither
+  is a 25 Nov event, and the footer says so.
+
 ## Run
 
 ```sh

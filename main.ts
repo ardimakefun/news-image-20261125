@@ -131,6 +131,7 @@ const SUN: RGB = [240, 180, 60];
 const WHITE: RGB = [255, 255, 255];
 const GREY: RGB = [90, 90, 90];
 const LIGHT: RGB = [232, 228, 216];
+const GREEN: RGB = [34, 130, 60];
 
 class Canvas {
   data = new Uint8Array(W * H * 3);
@@ -462,6 +463,20 @@ const STRIP: { kick: string; head: string; body: string }[] = [
   },
 ];
 
+// Numbers strip: 6 big numbers, each from a story already on this page.
+// 74 = Ahmadi lashes (secondary); 39M = GTA 6 PS5 players in 4 days (strip);
+// 204* = Suryavanshi runs (strip); 53 = balls for that 204* (strip);
+// 3 = tankers hit by mines in Hormuz (secondary, "THREE TANKERS");
+// 2027 = year of the Sarkozy trial, 1 Apr 2027 (ticker).
+const NUMBERS: { num: string; label: string }[] = [
+  { num: "74", label: "LASHES" },
+  { num: "39M", label: "GTA 6 PLAYERS" },
+  { num: "204*", label: "RUNS, AGE 15" },
+  { num: "53", label: "BALLS, 204*" },
+  { num: "3", label: "TANKERS HIT" },
+  { num: "2027", label: "SARKOZY TRIAL" },
+];
+
 function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string, maxWidth: number): number {
   const lines = wrap(s, scale, maxWidth);
   for (let i = 0; i < lines.length; i++) {
@@ -473,15 +488,19 @@ function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string
 function main(): void {
   const cv = new Canvas();
 
-  // Masthead.
-  drawTextCentered(cv, W / 2, 26, 11, INK, "THE WORLD", true);
-  drawTextCentered(cv, W / 2, 114, 3, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
-  cv.rect(32, 142, W - 64, 5, RED);
-  cv.rect(32, 151, W - 64, 2, INK);
+  // Masthead. 13 stories on the page (1 lead + 6 secondary + 3 strip + 3 ticker)
+  // across 10 fields: war, space, court, tech, human rights, energy, culture,
+  // politics, games, sport. The two counts flank the dateline.
+  drawTextCentered(cv, W / 2, 22, 10, INK, "THE WORLD", true);
+  drawText(cv, 32, 100, 2, INK, "13 STORIES", true);
+  drawText(cv, 992 - textWidth("10 FIELDS", 2), 100, 2, INK, "10 FIELDS", true);
+  drawTextCentered(cv, W / 2, 100, 3, INK, "WEDNESDAY, 25 NOVEMBER 2026", true);
+  cv.rect(32, 128, W - 64, 5, RED);
+  cv.rect(32, 137, W - 64, 2, INK);
 
   // Lead story.
-  const leadY = 164;
-  const leadH = 272;
+  const leadY = 150;
+  const leadH = 232;
   drawLeadArt(cv, 32, leadY, 438, leadH);
   cv.frame(32, leadY, 438, leadH, INK);
   const tx = 492;
@@ -492,26 +511,27 @@ function main(): void {
   drawPara(
     cv,
     tx,
-    leadY + 116,
+    leadY + 108,
     2,
     INK,
     "PRESIDENT ZELENSKIY CONFIRMS UKRAINE WAS BEHIND SATURDAY'S DRONE STRIKE ON A RUSSIAN CARGO SHIP IN THE GULF OF FINLAND. NORWAY, A KYIV ALLY, URGES CAUTION.",
     500,
-    5
+    4
   );
-  cv.rect(tx, leadY + 232, 500, 2, LIGHT);
-  drawText(cv, tx, leadY + 242, 2, GREY, "KYIV ALSO CLAIMS WARSHIP SUNK OFF LIBYA.");
+  cv.rect(tx, leadY + 199, 500, 2, LIGHT);
+  drawText(cv, tx, leadY + 209, 2, GREY, "KYIV ALSO CLAIMS WARSHIP SUNK OFF LIBYA.");
 
-  // Secondary stories: 2 columns x 3 rows.
-  drawText(cv, 32, 450, 2, INK, "MORE WORLD NEWS", true);
-  cv.rect(32, 470, W - 64, 2, INK);
+  // Secondary stories: 2 columns x 3 rows. Pitch 94: rows 1-2 hold at most
+  // 88px of text, so a 6px gap is enough; row 3 holds up to 106px.
+  drawText(cv, 32, 396, 2, INK, "MORE WORLD NEWS", true);
+  cv.rect(32, 416, W - 64, 2, INK);
   const cellW = 468;
   const cellH = 100;
   for (let i = 0; i < SECONDARY.length; i++) {
     const col = i % 2;
     const row = Math.floor(i / 2);
     const x = 32 + col * (cellW + 24);
-    const y = 482 + row * (cellH + 8);
+    const y = 428 + row * 94;
     const st = SECONDARY[i];
     cv.rect(x, y + 2, 48, 48, LIGHT);
     cv.frame(x, y + 2, 48, 48, INK);
@@ -519,26 +539,59 @@ function main(): void {
     const hx = x + 62;
     const hy = drawHeadline(cv, hx, y, 2, st.head, cellW - 62);
     drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 4);
-    if (row < 2) cv.rect(x, y + cellH - 2, cellW, 1, LIGHT);
+    if (row < 2) cv.rect(x, y + 92, cellW, 1, LIGHT);
+  }
+
+  // Numbers strip: 6 big numbers (see NUMBERS above for sources).
+  cv.rect(32, 738, W - 64, 2, INK);
+  for (let i = 0; i < NUMBERS.length; i++) {
+    const x = 32 + i * 160;
+    drawTextCentered(cv, x + 80, 746, 4, RED, NUMBERS[i].num, true);
+    drawTextCentered(cv, x + 80, 780, 2, INK, NUMBERS[i].label, true);
+  }
+
+  // Region strip: story count per region; the chips sum to the 13 in the
+  // masthead. EUROPE 3 (lead ship, NATO space, Sarkozy) - ASIA 3 (Shenzhou,
+  // cricket, South Korea) - MIDDLE EAST 3 (Ahmadi, Hormuz, Gaza) -
+  // AMERICAS 4 (Huawei US court, Microsoft, Thanksgiving, GTA 6).
+  const chipW = 184;
+  const chipGap = 8;
+  const chipY = 806;
+  const chipH = 28;
+  const chips: { label: string; bg: RGB; fg: RGB }[] = [
+    { label: "REGIONS", bg: INK, fg: WHITE },
+    { label: "EUROPE 3", bg: NAVY, fg: WHITE },
+    { label: "ASIA 3", bg: GREEN, fg: WHITE },
+    { label: "MIDDLE EAST 3", bg: RED, fg: WHITE },
+    { label: "AMERICAS 4", bg: SUN, fg: INK },
+  ];
+  for (let i = 0; i < chips.length; i++) {
+    const x = 36 + i * (chipW + chipGap);
+    cv.rect(x, chipY, chipW, chipH, chips[i].bg);
+    drawTextCentered(cv, x + chipW / 2, chipY + 7, 2, chips[i].fg, chips[i].label, true);
   }
 
   // Bottom strip: lighter stories.
-  drawText(cv, 32, 810, 2, RED, "ALSO TODAY", true);
-  cv.rect(32, 830, W - 64, 2, INK);
+  drawText(cv, 32, 846, 2, RED, "ALSO TODAY", true);
+  cv.rect(32, 866, W - 64, 2, INK);
   const stripW = 304;
   for (let i = 0; i < STRIP.length; i++) {
     const x = 32 + i * (stripW + 16);
-    const y = 842;
+    const y = 878;
     drawText(cv, x, y, 2, RED, STRIP[i].kick, true);
     const hy = drawHeadline(cv, x, y + 20, 2, STRIP[i].head, stripW);
     drawPara(cv, x, hy + 2, 2, INK, STRIP[i].body, stripW, 4);
-    if (i < 2) cv.vline(x + stripW + 8, y, 94, LIGHT);
+    if (i < 2) cv.vline(x + stripW + 8, y, 84, LIGHT);
   }
 
-  // Ticker + footer.
-  cv.rect(32, 944, W - 64, 2, INK);
-  drawText(cv, 32, 954, 2, INK, "ALSO: SARKOZY TO TRIAL - SOUTH KOREA MINISTER RESIGNS - ISRAELI STRIKE IN GAZA", true);
-  drawTextCentered(cv, W / 2, 980, 2, GREY, "ALL STORIES FIRST REPORTED ON WEDNESDAY, 25 NOVEMBER 2026");
+  // Ticker + footer. The old "all stories first reported 25 Nov" line is
+  // gone: two lead facts are NOT 25 Nov events, so the footer says so
+  // honestly. Drone strike on the Russian ship: Saturday 21 Nov, confirmed
+  // by Zelenskiy 25 Nov. Libya warship claim: Monday 23 Nov.
+  cv.rect(32, 972, W - 64, 2, INK);
+  drawText(cv, 32, 980, 2, INK, "ALSO: SARKOZY TO TRIAL - SOUTH KOREA MINISTER RESIGNS - ISRAELI STRIKE IN GAZA", true);
+  drawText(cv, 32, 1000, 2, RED, "DATE CHECK:", true);
+  drawText(cv, 32 + textWidth("DATE CHECK: ", 2), 1000, 2, INK, "SHIP STRIKE SAT 21 NOV - LIBYA CLAIM MON 23 NOV", true);
 
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });
