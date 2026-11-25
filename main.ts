@@ -381,7 +381,7 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   }
   // Cargo ship on the sea, ~1.3x the v1 size (all offsets from the bow
   // origin sx, scaled by 1.3; hull baseline hullY unchanged).
-  const sx = x + 52;
+  const sx = x + 8; // hull (286 wide) must fit a 309-wide lead column
   const hullY = seaY + 34;
   cv.rect(sx, hullY - 34, 286, 34, [30, 30, 30]); // hull
   cv.tri(sx, hullY, sx + 286, hullY, sx + 257, hullY + 29, [30, 30, 30]);
@@ -405,6 +405,83 @@ function drawLeadArt(cv: Canvas, x: number, y: number, w: number, h: number): vo
   drawText(cv, x + 14, y + h - 26, 2, WHITE, "GULF OF FINLAND", true);
 }
 
+// --------------------------------------- lead scene: satellite over Earth
+// Original geometric scene: dark sky, stars, Earth arc below, one satellite
+// with solar panels on a diagonal orbit line.
+function drawLeadArtSatellite(cv: Canvas, x: number, y: number, w: number, h: number): void {
+  cv.rect(x, y, w, h, NAVY); // night sky
+  // Stars (fixed positions, no randomness).
+  const stars: [number, number, number][] = [
+    [18, 14, 2], [52, 30, 2], [96, 12, 2], [140, 26, 2], [186, 10, 2],
+    [228, 28, 2], [268, 14, 2], [296, 40, 2], [30, 58, 2], [120, 52, 2],
+    [210, 56, 2], [70, 84, 2], [250, 84, 2], [160, 70, 2],
+  ];
+  for (const [sx, sy, r] of stars) cv.circle(x + sx, y + sy, r, WHITE);
+  cv.circle(x + 272, y + 96, 10, WHITE); // moon
+  cv.circle(x + 272, y + 96, 7, LIGHT);
+  // Orbit line (diagonal, behind the satellite).
+  cv.line(x + 8, y + 118, x + w - 8, y + 34, WHITE);
+  // Earth arc: big circle rising ~57px from the bottom edge (the part
+  // below the frame is clipped by the PAPER rect below).
+  cv.circle(x + 150, y + h + 28, 85, SEA);
+  cv.circle(x + 104, y + h + 2, 20, GREEN); // land
+  cv.circle(x + 196, y + h + 6, 16, GREEN); // land
+  cv.rect(x + 176, y + h - 36, 56, 6, WHITE); // cloud band
+  // Clip: the Earth circle must not spill below the art frame into the
+  // headline area (the circle is centred below the frame by design).
+  cv.rect(x, y + h, w, 180, PAPER);
+  // Satellite: body + two panels + dish, centred on the orbit line.
+  const bx = x + 128;
+  const by = y + 52;
+  cv.rect(bx - 52, by - 4, 34, 12, [70, 110, 160]); // left panel
+  cv.rect(bx + 30, by - 4, 34, 12, [70, 110, 160]); // right panel
+  cv.rect(bx - 52, by - 4, 34, 2, WHITE);
+  cv.rect(bx + 30, by - 4, 34, 2, WHITE);
+  cv.rect(bx - 14, by - 10, 40, 24, WHITE); // body
+  cv.rect(bx - 14, by - 10, 40, 4, RED);
+  cv.rect(bx + 2, by + 2, 8, 8, NAVY); // lens
+  cv.line(bx + 26, by - 10, bx + 44, by - 26, WHITE); // antenna
+  cv.circle(bx + 46, by - 28, 4, RED);
+  drawText(cv, x + 12, y + h - 26, 2, WHITE, "EARTH ORBIT", true);
+}
+
+// --------------------------------------- lead scene: rocket + space station
+// Original geometric scene: daylight sky, rocket climbing with flame and
+// smoke, a small modular station at top right.
+function drawLeadArtRocket(cv: Canvas, x: number, y: number, w: number, h: number): void {
+  cv.rect(x, y, w, h, SKY); // sky
+  cv.circle(x + w - 40, y + 26, 16, SUN);
+  cv.rect(x + 16, y + 18, 56, 10, WHITE); // clouds
+  cv.rect(x + 30, y + 10, 34, 8, WHITE);
+  // Space station, top right: core + two modules + solar panels.
+  const sx = x + w - 118;
+  const sy = y + 42;
+  cv.rect(sx, sy, 44, 14, WHITE);
+  cv.rect(sx + 48, sy + 2, 26, 10, WHITE);
+  cv.rect(sx - 30, sy + 2, 26, 10, WHITE);
+  cv.rect(sx - 58, sy - 6, 26, 26, NAVY); // left panel
+  cv.rect(sx + 78, sy - 6, 26, 26, NAVY); // right panel
+  cv.rect(sx + 18, sy - 8, 8, 8, RED); // docking node
+  // Rocket, centre-left, climbing.
+  const rx = x + 96;
+  const ry = y + 34;
+  cv.tri(rx, ry + 62, rx + 12, ry + 62, rx + 6, ry + 96, SUN); // flame
+  cv.tri(rx + 4, ry + 62, rx + 8, ry + 62, rx + 6, ry + 82, RED);
+  cv.rect(rx - 6, ry + 18, 24, 46, WHITE); // body
+  cv.rect(rx - 6, ry + 18, 24, 5, RED); // band
+  cv.tri(rx - 6, ry + 18, rx + 18, ry + 18, rx + 6, ry, RED); // nose
+  cv.circle(rx + 6, ry + 34, 5, NAVY); // window
+  cv.tri(rx - 6, ry + 50, rx - 18, ry + 70, rx - 6, ry + 64, RED); // fin
+  cv.tri(rx + 18, ry + 50, rx + 30, ry + 70, rx + 18, ry + 64, RED); // fin
+  // Smoke puffs below the flame.
+  cv.circle(rx - 8, y + h - 22, 12, WHITE);
+  cv.circle(rx + 20, y + h - 18, 14, WHITE);
+  cv.circle(rx + 6, y + h - 28, 10, LIGHT);
+  // Ground strip.
+  cv.rect(x, y + h - 10, w, 10, GREEN);
+  drawText(cv, x + 12, y + h - 26, 2, INK, "TIANGONG", true);
+}
+
 // ------------------------------------------------------------------ layout
 interface Story {
   icon: (cv: Canvas, x: number, y: number) => void;
@@ -414,11 +491,6 @@ interface Story {
 
 const SECONDARY: Story[] = [
   {
-    icon: iconSatellite,
-    head: "NATO VOWS SPACE DEFENCE",
-    body: "NATO PLEDGES TO DEFEND SPACE AFTER A REPORT THAT RUSSIA PLANS A NUCLEAR-ARMED SATELLITE LAUNCH, POSSIBLY IN DECEMBER.",
-  },
-  {
     icon: iconCourt,
     head: "HUAWEI CONVICTED IN US COURT",
     body: "GUILTY ON IRAN BUSINESS AND TRADE-SECRET THEFT CHARGES IN A US CRIMINAL TRIAL.",
@@ -427,11 +499,6 @@ const SECONDARY: Story[] = [
     icon: iconWindows,
     head: "MICROSOFT DECLARES 'CODE RED'",
     body: "AFTER A HISTORIC OUTAGE; A LEAKED INTERNAL MEMO REVEALS THE CRISIS RESPONSE.",
-  },
-  {
-    icon: iconRocket,
-    head: "SHENZHOU-24 LAUNCHES TO TIANGONG",
-    body: "CHINA LAUNCHES A CREW TO ITS SPACE STATION, CARRYING THE FIRST PAKISTANI ASTRONAUT, THE FIRST FOREIGNER ABOARD.",
   },
   {
     icon: iconMusic,
@@ -477,6 +544,32 @@ const NUMBERS: { num: string; label: string }[] = [
   { num: "2027", label: "SARKOZY TRIAL" },
 ];
 
+// Three leads (Chunk B): the ship lead stays, NATO space defence and
+// Shenzhou-24 are promoted from secondary. Headlines + summaries reuse
+// text already on the page (verbatim excerpts, no new facts).
+interface Lead {
+  art: (cv: Canvas, x: number, y: number, w: number, h: number) => void;
+  head: string;
+  body: string;
+}
+const LEADS: Lead[] = [
+  {
+    art: drawLeadArt,
+    head: "ZELENSKIY: WE HIT RUSSIAN SHIP",
+    body: "UKRAINE WAS BEHIND SATURDAY'S DRONE STRIKE ON A RUSSIAN CARGO SHIP IN THE GULF OF FINLAND.",
+  },
+  {
+    art: drawLeadArtSatellite,
+    head: "NATO VOWS SPACE DEFENCE",
+    body: "NATO PLEDGES TO DEFEND SPACE AFTER A REPORT THAT RUSSIA PLANS A NUCLEAR-ARMED SATELLITE LAUNCH.",
+  },
+  {
+    art: drawLeadArtRocket,
+    head: "SHENZHOU-24 LAUNCHES TO TIANGONG",
+    body: "CHINA LAUNCHES A CREW TO ITS SPACE STATION, CARRYING THE FIRST PAKISTANI ASTRONAUT.",
+  },
+];
+
 function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string, maxWidth: number): number {
   const lines = wrap(s, scale, maxWidth);
   for (let i = 0; i < lines.length; i++) {
@@ -488,7 +581,7 @@ function drawHeadline(cv: Canvas, x: number, y: number, scale: number, s: string
 function main(): void {
   const cv = new Canvas();
 
-  // Masthead. 13 stories on the page (1 lead + 6 secondary + 3 strip + 3 ticker)
+  // Masthead. 13 stories on the page (3 leads + 4 secondary + 3 strip + 3 ticker)
   // across 10 fields: war, space, court, tech, human rights, energy, culture,
   // politics, games, sport. The two counts flank the dateline.
   drawTextCentered(cv, W / 2, 22, 10, INK, "THE WORLD", true);
@@ -498,40 +591,33 @@ function main(): void {
   cv.rect(32, 128, W - 64, 5, RED);
   cv.rect(32, 137, W - 64, 2, INK);
 
-  // Lead story.
+  // Three leads in one row (Chunk B): 3 columns, each art on top, then
+  // headline, then a short summary. Column width 309, gap 16.
+  // Art 150-300, headlines 308-383 (3 lines max at scale 3), summaries
+  // 385-457 (4 lines max at scale 2, aligned across columns).
   const leadY = 150;
-  const leadH = 232;
-  drawLeadArt(cv, 32, leadY, 438, leadH);
-  cv.frame(32, leadY, 438, leadH, INK);
-  const tx = 492;
-  drawText(cv, tx, leadY + 4, 2, RED, "LEAD STORY - UKRAINE WAR", true);
-  drawText(cv, tx, leadY + 30, 4, INK, "ZELENSKIY: WE HIT", true);
-  drawText(cv, tx, leadY + 62, 4, INK, "RUSSIAN SHIP", true);
-  cv.rect(tx, leadY + 102, 500, 2, INK);
-  drawPara(
-    cv,
-    tx,
-    leadY + 108,
-    2,
-    INK,
-    "PRESIDENT ZELENSKIY CONFIRMS UKRAINE WAS BEHIND SATURDAY'S DRONE STRIKE ON A RUSSIAN CARGO SHIP IN THE GULF OF FINLAND. NORWAY, A KYIV ALLY, URGES CAUTION.",
-    500,
-    4
-  );
-  cv.rect(tx, leadY + 199, 500, 2, LIGHT);
-  drawText(cv, tx, leadY + 209, 2, GREY, "KYIV ALSO CLAIMS WARSHIP SUNK OFF LIBYA.");
+  const leadH = 150;
+  const leadW = 309;
+  for (let i = 0; i < LEADS.length; i++) {
+    const x = 32 + i * (leadW + 16);
+    const ld = LEADS[i];
+    ld.art(cv, x, leadY, leadW, leadH);
+    cv.frame(x, leadY, leadW, leadH, INK);
+    drawHeadline(cv, x, leadY + 158, 3, ld.head, leadW);
+    drawPara(cv, x, leadY + 235, 2, INK, ld.body, leadW, 4);
+  }
 
-  // Secondary stories: 2 columns x 3 rows. Pitch 94: rows 1-2 hold at most
-  // 88px of text, so a 6px gap is enough; row 3 holds up to 106px.
-  drawText(cv, 32, 396, 2, INK, "MORE WORLD NEWS", true);
-  cv.rect(32, 416, W - 64, 2, INK);
+  // Secondary stories: 2 columns x 2 rows (4 stories left after the two
+  // promotions). Pitch 112: row 2 (Ahmadi) holds up to 108px of text.
+  drawText(cv, 32, 474, 2, INK, "MORE WORLD NEWS", true);
+  cv.rect(32, 494, W - 64, 2, INK);
   const cellW = 468;
   const cellH = 100;
   for (let i = 0; i < SECONDARY.length; i++) {
     const col = i % 2;
     const row = Math.floor(i / 2);
     const x = 32 + col * (cellW + 24);
-    const y = 428 + row * 94;
+    const y = 506 + row * 112;
     const st = SECONDARY[i];
     cv.rect(x, y + 2, 48, 48, LIGHT);
     cv.frame(x, y + 2, 48, 48, INK);
@@ -539,7 +625,7 @@ function main(): void {
     const hx = x + 62;
     const hy = drawHeadline(cv, hx, y, 2, st.head, cellW - 62);
     drawPara(cv, hx, hy + 2, 2, INK, st.body, cellW - 62, 4);
-    if (row < 2) cv.rect(x, y + 92, cellW, 1, LIGHT);
+    if (row < 1) cv.rect(x, y + 92, cellW, 1, LIGHT);
   }
 
   // Numbers strip: 6 big numbers (see NUMBERS above for sources).
